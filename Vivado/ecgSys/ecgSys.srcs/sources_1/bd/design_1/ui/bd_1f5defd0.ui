@@ -1,0 +1,42 @@
+{
+   guistr: "# # String gsaved with Nlview 6.4.10  2014-10-02 bk=1.3207 VDI=35 GEI=35 GUI=JA:1.6
+#  -string -flagsOSRD
+preplace port DDR -pg 1 -y 80 -defaultsOSRD
+preplace port LEDs_8Bits -pg 1 -y 160 -defaultsOSRD
+preplace port BTNs_5Bits -pg 1 -y 320 -defaultsOSRD
+preplace port FIXED_IO -pg 1 -y 100 -defaultsOSRD
+preplace inst bandPass_fir_0 -pg 1 -lvl 4 -y 380 -defaultsOSRD
+preplace inst rst_processing_system7_0_100M -pg 1 -lvl 1 -y 370 -defaultsOSRD
+preplace inst broadcast_signal_0 -pg 1 -lvl 5 -y 390 -defaultsOSRD
+preplace inst raw_signal_0 -pg 1 -lvl 3 -y 390 -defaultsOSRD
+preplace inst axi_gpio_0 -pg 1 -lvl 3 -y 180 -defaultsOSRD
+preplace inst noise_free_signal_0 -pg 1 -lvl 6 -y 240 -defaultsOSRD
+preplace inst ECG_Unit_0 -pg 1 -lvl 7 -y 440 -defaultsOSRD
+preplace inst difference_signal_0 -pg 1 -lvl 8 -y 590 -defaultsOSRD
+preplace inst differentiator_fir_0 -pg 1 -lvl 6 -y 410 -defaultsOSRD
+preplace inst processing_system7_0_axi_periph -pg 1 -lvl 2 -y 310 -defaultsOSRD
+preplace inst processing_system7_0 -pg 1 -lvl 1 -y 150 -defaultsOSRD
+preplace netloc processing_system7_0_DDR 1 1 8 NJ 80 NJ 80 NJ 80 NJ 80 NJ 80 NJ 80 NJ 80 N
+preplace netloc axis_broadcaster_0_M00_AXIS 1 5 1 1690
+preplace netloc processing_system7_0_axi_periph_M03_AXI 1 2 1 750
+preplace netloc processing_system7_0_axi_periph_M00_AXI 1 2 1 780
+preplace netloc processing_system7_0_M_AXI_GP0 1 1 1 410
+preplace netloc processing_system7_0_FCLK_RESET0_N 1 0 2 30 30 400
+preplace netloc axis_broadcaster_0_M01_AXIS 1 5 1 N
+preplace netloc processing_system7_0_axi_periph_M02_AXI 1 2 5 N 310 NJ 440 NJ 320 NJ 320 NJ
+preplace netloc axi_fifo_mm_s_0_AXI_STR_TXD 1 3 1 N
+preplace netloc rst_processing_system7_0_100M_peripheral_aresetn 1 1 7 430 520 790 460 NJ 460 1390 310 1710 470 2040 620 NJ
+preplace netloc fir_compiler_0_M_AXIS_DATA1 1 6 1 2020
+preplace netloc processing_system7_0_FIXED_IO 1 1 8 NJ 100 NJ 100 NJ 100 NJ 100 NJ 100 NJ 100 NJ 100 N
+preplace netloc axi_gpio_0_GPIO2 1 3 6 N 180 NJ 180 NJ 160 NJ 310 NJ 320 NJ
+preplace netloc axi_gpio_0_GPIO 1 3 6 N 160 NJ 160 NJ 150 NJ 160 NJ 160 NJ
+preplace netloc axi_gpio_0_ip2intc_irpt 1 0 4 40 20 NJ 20 NJ 20 1130
+preplace netloc rst_processing_system7_0_100M_interconnect_aresetn 1 1 1 410
+preplace netloc processing_system7_0_FCLK_CLK0 1 0 8 20 10 420 510 760 320 1120 470 1410 460 1700 480 2030 320 2290
+preplace netloc fir_compiler_0_M_AXIS_DATA 1 4 1 1410
+preplace netloc processing_system7_0_axi_periph_M04_AXI 1 2 6 750 560 NJ 560 NJ 560 NJ 560 NJ 560 NJ
+preplace netloc processing_system7_0_axi_periph_M01_AXI 1 2 4 770 250 NJ 210 NJ 210 NJ
+preplace netloc ECG_Unit_0_M00_AXIS 1 7 1 2280
+levelinfo -pg 1 0 220 600 970 1260 1550 1860 2160 2450 2630
+",
+}
