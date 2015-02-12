@@ -1,0 +1,26 @@
+[_setup_]
+port=COM4   
+baudrate=57600
+
+width=2200
+height=1600
+background_color = white
+
+grid_h_origin = 800
+grid_h_step = 50
+grid_h_color = #EEE
+grid_h_origin_color = #CCC
+
+grid_v_origin = 0
+grid_v_step = 50
+grid_v_color = #EEE
+grid_v_origin_color = transparent
+
+[_default_]
+min=0
+max=2048
+
+
+[RxEcg]
+color=red
+dash = 1
