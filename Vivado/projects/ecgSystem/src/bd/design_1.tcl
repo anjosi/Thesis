@@ -10,7 +10,7 @@
 ################################################################
 # Check if script is running in correct Vivado version.
 ################################################################
-set scripts_vivado_version 2014.4
+set scripts_vivado_version 2015.1
 set current_vivado_version [version -short]
 
 if { [string first $scripts_vivado_version $current_vivado_version] == -1 } {
@@ -152,9 +152,9 @@ proc create_root_design { parentCell } {
 
   # Create ports
 
-  # Create instance: ECG_Unit_0, and set properties
-  set ECG_Unit_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:ECG_Unit:1.4 ECG_Unit_0 ]
-  set_property -dict [ list CONFIG.C_M00_AXIS_START_COUNT {1} CONFIG.C_M_FIFO_DEPTH {256} CONFIG.C_S_FIFO_DEPTH {256} CONFIG.C_S_READ_f_FIFO_START_COUNT {1}  ] $ECG_Unit_0
+  # Create instance: ECG_Detector_0, and set properties
+  set ECG_Detector_0 [ create_bd_cell -type ip -vlnv xilinx.com:user:ECG_Detector:5.9 ECG_Detector_0 ]
+  set_property -dict [ list CONFIG.C_ECG_DELAY {106} CONFIG.C_S_AXIS_TX_2_ENABLE {true} CONFIG.C_TX_SMP_01_AXIS_START_COUNT {5} CONFIG.C_TX_SMP_02_AXIS_START_COUNT {5}  ] $ECG_Detector_0
 
   # Create instance: axi_gpio_0, and set properties
   set axi_gpio_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_gpio:2.0 axi_gpio_0 ]
@@ -173,7 +173,7 @@ proc create_root_design { parentCell } {
 
   # Create instance: differentiator_fir_0, and set properties
   set differentiator_fir_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:fir_compiler:7.2 differentiator_fir_0 ]
-  set_property -dict [ list CONFIG.BestPrecision {true} CONFIG.Clock_Frequency {50} CONFIG.CoefficientSource {COE_File} CONFIG.Coefficient_File {../../../../../../../../GitHub/Thesis/Vivado/projects/ecgSystem/src/coe/diff_05_45.coe} CONFIG.Coefficient_Fractional_Bits {15} CONFIG.DATA_Has_TLAST {Packet_Framing} CONFIG.Data_Fractional_Bits {16} CONFIG.Data_Sign {Signed} CONFIG.Data_Width {32} CONFIG.M_DATA_Has_TREADY {true} CONFIG.Output_Rounding_Mode {Truncate_LSBs} CONFIG.Output_Width {32} CONFIG.Quantization {Quantize_Only} CONFIG.Sample_Frequency {0.0005}  ] $differentiator_fir_0
+  set_property -dict [ list CONFIG.BestPrecision {true} CONFIG.Clock_Frequency {50} CONFIG.CoefficientSource {COE_File} CONFIG.Coefficient_File {../../../../../../../../GitHub/Thesis/Vivado/projects/ecgSystem/src/coe/diff_8_45.coe} CONFIG.DATA_Has_TLAST {Packet_Framing} CONFIG.Data_Fractional_Bits {16} CONFIG.Data_Sign {Signed} CONFIG.Data_Width {32} CONFIG.M_DATA_Has_TREADY {true} CONFIG.Output_Rounding_Mode {Truncate_LSBs} CONFIG.Output_Width {32} CONFIG.Quantization {Quantize_Only} CONFIG.Sample_Frequency {0.0005}  ] $differentiator_fir_0
 
   # Create instance: noise_free_signal_0, and set properties
   set noise_free_signal_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_fifo_mm_s:4.1 noise_free_signal_0 ]
@@ -193,12 +193,12 @@ CONFIG.PCW_SD0_PERIPHERAL_ENABLE {0} CONFIG.PCW_TTC0_PERIPHERAL_ENABLE {0} \
 CONFIG.PCW_UART0_GRP_FULL_ENABLE {0} CONFIG.PCW_UART0_PERIPHERAL_ENABLE {1} \
 CONFIG.PCW_UART0_UART0_IO {MIO 10 .. 11} CONFIG.PCW_UART1_BAUD_RATE {115200} \
 CONFIG.PCW_USB0_PERIPHERAL_ENABLE {0} CONFIG.PCW_USE_AXI_FABRIC_IDLE {1} \
-CONFIG.PCW_USE_FABRIC_INTERRUPT {1} CONFIG.preset {ZedBoard*} \
+CONFIG.PCW_USE_FABRIC_INTERRUPT {1} CONFIG.preset {ZedBoard} \
  ] $processing_system7_0
 
   # Create instance: processing_system7_0_axi_periph, and set properties
   set processing_system7_0_axi_periph [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_interconnect:2.1 processing_system7_0_axi_periph ]
-  set_property -dict [ list CONFIG.ENABLE_ADVANCED_OPTIONS {0} CONFIG.NUM_MI {5}  ] $processing_system7_0_axi_periph
+  set_property -dict [ list CONFIG.ENABLE_ADVANCED_OPTIONS {0} CONFIG.NUM_MI {8}  ] $processing_system7_0_axi_periph
 
   # Create instance: raw_signal_0, and set properties
   set raw_signal_0 [ create_bd_cell -type ip -vlnv xilinx.com:ip:axi_fifo_mm_s:4.1 raw_signal_0 ]
@@ -208,32 +208,33 @@ CONFIG.PCW_USE_FABRIC_INTERRUPT {1} CONFIG.preset {ZedBoard*} \
   set rst_processing_system7_0_100M [ create_bd_cell -type ip -vlnv xilinx.com:ip:proc_sys_reset:5.0 rst_processing_system7_0_100M ]
 
   # Create interface connections
-  connect_bd_intf_net -intf_net ECG_Unit_0_M00_AXIS [get_bd_intf_pins ECG_Unit_0/M00_AXIS] [get_bd_intf_pins difference_signal_0/AXI_STR_RXD]
+  connect_bd_intf_net -intf_net ECG_Detector_0_TX_SMP_01_AXIS [get_bd_intf_pins ECG_Detector_0/TX_SMP_01_AXIS] [get_bd_intf_pins noise_free_signal_0/AXI_STR_RXD]
+  connect_bd_intf_net -intf_net ECG_Detector_0_TX_SMP_02_AXIS [get_bd_intf_pins ECG_Detector_0/TX_SMP_02_AXIS] [get_bd_intf_pins difference_signal_0/AXI_STR_RXD]
   connect_bd_intf_net -intf_net axi_fifo_mm_s_0_AXI_STR_TXD [get_bd_intf_pins bandPass_fir_0/S_AXIS_DATA] [get_bd_intf_pins raw_signal_0/AXI_STR_TXD]
   connect_bd_intf_net -intf_net axi_gpio_0_GPIO [get_bd_intf_ports LEDs_8Bits] [get_bd_intf_pins axi_gpio_0/GPIO]
   connect_bd_intf_net -intf_net axi_gpio_0_GPIO2 [get_bd_intf_ports BTNs_5Bits] [get_bd_intf_pins axi_gpio_0/GPIO2]
-  connect_bd_intf_net -intf_net axis_broadcaster_0_M00_AXIS [get_bd_intf_pins broadcast_signal_0/M00_AXIS] [get_bd_intf_pins noise_free_signal_0/AXI_STR_RXD]
   connect_bd_intf_net -intf_net axis_broadcaster_0_M01_AXIS [get_bd_intf_pins broadcast_signal_0/M01_AXIS] [get_bd_intf_pins differentiator_fir_0/S_AXIS_DATA]
+  connect_bd_intf_net -intf_net broadcast_signal_0_M00_AXIS [get_bd_intf_pins ECG_Detector_0/DE_NSD_IN_AXIS] [get_bd_intf_pins broadcast_signal_0/M00_AXIS]
+  connect_bd_intf_net -intf_net differentiator_fir_0_M_AXIS_DATA [get_bd_intf_pins ECG_Detector_0/DIFF_IN_AXIS] [get_bd_intf_pins differentiator_fir_0/M_AXIS_DATA]
   connect_bd_intf_net -intf_net fir_compiler_0_M_AXIS_DATA [get_bd_intf_pins bandPass_fir_0/M_AXIS_DATA] [get_bd_intf_pins broadcast_signal_0/S_AXIS]
-  connect_bd_intf_net -intf_net fir_compiler_0_M_AXIS_DATA1 [get_bd_intf_pins ECG_Unit_0/S00_AXIS] [get_bd_intf_pins differentiator_fir_0/M_AXIS_DATA]
   connect_bd_intf_net -intf_net processing_system7_0_DDR [get_bd_intf_ports DDR] [get_bd_intf_pins processing_system7_0/DDR]
   connect_bd_intf_net -intf_net processing_system7_0_FIXED_IO [get_bd_intf_ports FIXED_IO] [get_bd_intf_pins processing_system7_0/FIXED_IO]
   connect_bd_intf_net -intf_net processing_system7_0_M_AXI_GP0 [get_bd_intf_pins processing_system7_0/M_AXI_GP0] [get_bd_intf_pins processing_system7_0_axi_periph/S00_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_axi_periph_M00_AXI [get_bd_intf_pins processing_system7_0_axi_periph/M00_AXI] [get_bd_intf_pins raw_signal_0/S_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_axi_periph_M01_AXI [get_bd_intf_pins noise_free_signal_0/S_AXI] [get_bd_intf_pins processing_system7_0_axi_periph/M01_AXI]
-  connect_bd_intf_net -intf_net processing_system7_0_axi_periph_M02_AXI [get_bd_intf_pins ECG_Unit_0/s00_axi] [get_bd_intf_pins processing_system7_0_axi_periph/M02_AXI]
+  connect_bd_intf_net -intf_net processing_system7_0_axi_periph_M02_AXI [get_bd_intf_pins ECG_Detector_0/CTRL_AXI] [get_bd_intf_pins processing_system7_0_axi_periph/M02_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_axi_periph_M03_AXI [get_bd_intf_pins axi_gpio_0/S_AXI] [get_bd_intf_pins processing_system7_0_axi_periph/M03_AXI]
   connect_bd_intf_net -intf_net processing_system7_0_axi_periph_M04_AXI [get_bd_intf_pins difference_signal_0/S_AXI] [get_bd_intf_pins processing_system7_0_axi_periph/M04_AXI]
 
   # Create port connections
   connect_bd_net -net axi_gpio_0_ip2intc_irpt [get_bd_pins axi_gpio_0/ip2intc_irpt] [get_bd_pins processing_system7_0/IRQ_F2P]
-  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins ECG_Unit_0/m00_axis_aclk] [get_bd_pins ECG_Unit_0/s00_axi_aclk] [get_bd_pins ECG_Unit_0/s00_axis_aclk] [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins bandPass_fir_0/aclk] [get_bd_pins broadcast_signal_0/aclk] [get_bd_pins difference_signal_0/s_axi_aclk] [get_bd_pins differentiator_fir_0/aclk] [get_bd_pins noise_free_signal_0/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0_axi_periph/ACLK] [get_bd_pins processing_system7_0_axi_periph/M00_ACLK] [get_bd_pins processing_system7_0_axi_periph/M01_ACLK] [get_bd_pins processing_system7_0_axi_periph/M02_ACLK] [get_bd_pins processing_system7_0_axi_periph/M03_ACLK] [get_bd_pins processing_system7_0_axi_periph/M04_ACLK] [get_bd_pins processing_system7_0_axi_periph/S00_ACLK] [get_bd_pins raw_signal_0/s_axi_aclk] [get_bd_pins rst_processing_system7_0_100M/slowest_sync_clk]
+  connect_bd_net -net processing_system7_0_FCLK_CLK0 [get_bd_pins ECG_Detector_0/aclk] [get_bd_pins axi_gpio_0/s_axi_aclk] [get_bd_pins bandPass_fir_0/aclk] [get_bd_pins broadcast_signal_0/aclk] [get_bd_pins difference_signal_0/s_axi_aclk] [get_bd_pins differentiator_fir_0/aclk] [get_bd_pins noise_free_signal_0/s_axi_aclk] [get_bd_pins processing_system7_0/FCLK_CLK0] [get_bd_pins processing_system7_0/M_AXI_GP0_ACLK] [get_bd_pins processing_system7_0_axi_periph/ACLK] [get_bd_pins processing_system7_0_axi_periph/M00_ACLK] [get_bd_pins processing_system7_0_axi_periph/M01_ACLK] [get_bd_pins processing_system7_0_axi_periph/M02_ACLK] [get_bd_pins processing_system7_0_axi_periph/M03_ACLK] [get_bd_pins processing_system7_0_axi_periph/M04_ACLK] [get_bd_pins processing_system7_0_axi_periph/M05_ACLK] [get_bd_pins processing_system7_0_axi_periph/M06_ACLK] [get_bd_pins processing_system7_0_axi_periph/M07_ACLK] [get_bd_pins processing_system7_0_axi_periph/S00_ACLK] [get_bd_pins raw_signal_0/s_axi_aclk] [get_bd_pins rst_processing_system7_0_100M/slowest_sync_clk]
   connect_bd_net -net processing_system7_0_FCLK_RESET0_N [get_bd_pins processing_system7_0/FCLK_RESET0_N] [get_bd_pins rst_processing_system7_0_100M/ext_reset_in]
   connect_bd_net -net rst_processing_system7_0_100M_interconnect_aresetn [get_bd_pins processing_system7_0_axi_periph/ARESETN] [get_bd_pins rst_processing_system7_0_100M/interconnect_aresetn]
-  connect_bd_net -net rst_processing_system7_0_100M_peripheral_aresetn [get_bd_pins ECG_Unit_0/m00_axis_aresetn] [get_bd_pins ECG_Unit_0/s00_axi_aresetn] [get_bd_pins ECG_Unit_0/s00_axis_aresetn] [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins broadcast_signal_0/aresetn] [get_bd_pins difference_signal_0/s_axi_aresetn] [get_bd_pins noise_free_signal_0/s_axi_aresetn] [get_bd_pins processing_system7_0_axi_periph/M00_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M01_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M02_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M03_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M04_ARESETN] [get_bd_pins processing_system7_0_axi_periph/S00_ARESETN] [get_bd_pins raw_signal_0/s_axi_aresetn] [get_bd_pins rst_processing_system7_0_100M/peripheral_aresetn]
+  connect_bd_net -net rst_processing_system7_0_100M_peripheral_aresetn [get_bd_pins ECG_Detector_0/aresetn] [get_bd_pins axi_gpio_0/s_axi_aresetn] [get_bd_pins broadcast_signal_0/aresetn] [get_bd_pins difference_signal_0/s_axi_aresetn] [get_bd_pins noise_free_signal_0/s_axi_aresetn] [get_bd_pins processing_system7_0_axi_periph/M00_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M01_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M02_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M03_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M04_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M05_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M06_ARESETN] [get_bd_pins processing_system7_0_axi_periph/M07_ARESETN] [get_bd_pins processing_system7_0_axi_periph/S00_ARESETN] [get_bd_pins raw_signal_0/s_axi_aresetn] [get_bd_pins rst_processing_system7_0_100M/peripheral_aresetn]
 
   # Create address segments
-  create_bd_addr_seg -range 0x10000 -offset 0x43C20000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs ECG_Unit_0/s00_axi/reg0] SEG_ECG_Unit_0_reg0
+  create_bd_addr_seg -range 0x10000 -offset 0x43C20000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs ECG_Detector_0/CTRL_AXI/CTRL_AXI_reg] SEG_ECG_Detector_0_CTRL_AXI_reg
   create_bd_addr_seg -range 0x10000 -offset 0x43C00000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs raw_signal_0/S_AXI/Mem0] SEG_axi_fifo_mm_s_0_Mem0
   create_bd_addr_seg -range 0x10000 -offset 0x43C10000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs noise_free_signal_0/S_AXI/Mem0] SEG_axi_fifo_mm_s_1_Mem0
   create_bd_addr_seg -range 0x10000 -offset 0x41200000 [get_bd_addr_spaces processing_system7_0/Data] [get_bd_addr_segs axi_gpio_0/S_AXI/Reg] SEG_axi_gpio_0_Reg

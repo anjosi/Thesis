@@ -1,6 +1,6 @@
 
 # Loading additional proc with user specified bodies to compute parameter values.
-source [file join [file dirname [file dirname [info script]]] component/ECG_Unit_v1_0.gtcl]
+source [file join [file dirname [file dirname [info script]]] ECG_Unit_v1_0.gtcl]
 
 # Definitional proc to organize widgets for parameters.
 proc init_gui { IPINST } {

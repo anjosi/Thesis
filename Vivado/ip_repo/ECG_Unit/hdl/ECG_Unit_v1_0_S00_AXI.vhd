@@ -6,7 +6,13 @@ use work.ecg_components.all;
 entity ECG_Unit_v1_0_S00_AXI is
 	generic (
 		-- Users to add parameters here
-
+            C_R_THRESHOLD_PRI   : integer :=2000000;
+            C_T_THRESHOLD_PRI    : integer := 2000;
+           C_P_THRESHOLD_PRI   : integer :=900;
+            C_R_THRESHOLD_SEC   : integer :=1000000;
+            C_T_THRESHOLD_SEC    : integer := 1000;
+             C_P_THRESHOLD_SEC    : integer := 500;
+         
 		-- User parameters ends
 		-- Do not modify the parameters beyond this line
 
@@ -14,6 +20,7 @@ entity ECG_Unit_v1_0_S00_AXI is
 		C_S_AXI_DATA_WIDTH	: integer	:= 32;
 		-- Width of S_AXI address bus
 		C_S_AXI_ADDR_WIDTH	: integer	:= 7
+		
 	);
 	port (
 		-- Users to add ports here
@@ -147,15 +154,11 @@ signal reg_data_out    :std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 signal byte_index    : integer;
 signal d_1, x             :std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
 signal diff_sig, diff_sig_r     : std_logic_vector(C_S_AXI_DATA_WIDTH-1 downto 0);
+subtype counter_int is integer range 0 to 2500;
+signal q_start_counter : counter_int;
+signal update_q : std_logic;
 
-component c_subtractor_0 is
-  PORT (
-    A : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    B : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
-    CLK : IN STD_LOGIC;
-    S : OUT STD_LOGIC_VECTOR(31 DOWNTO 0)
-  );
-end component c_addsub_0;
+
 begin
 --    I/O    Connections    assignments
 
@@ -781,6 +784,38 @@ begin
 end process;
 
 diff_sig <= std_logic_vector(signed(x) - signed(d_1));
+
+
+
+counter:process(S_AXI_ACLK)
+
+begin
+
+  if (rising_edge (S_AXI_ACLK)) then
+    if ( S_AXI_ARESETN = '0' ) then
+        q_start_counter <= 0;
+   else
+    if S_AXI_SAMPLE_VALID = '1' then
+        q_start_counter <= q_start_counter + 1; -- always count when there's a valid sample in the input port
+        if update_q = '1' then
+            q_start_counter <= 0;
+        end if;
+    end if;
+   end if;   
+  end if;
+
+end process counter;
+
+q_start_point:process(d_1, x)
+
+begin
+    if x <= d_1 then -- current sample is less or equal to the previous 
+        update_q <= '1';    -- restart the counter
+    else
+        update_q <= '0';    --keep counting
+    end if;
+
+end process q_start_point;
 
 --diff_Sub:c_subtractor_0 port map ( A => x, B => d_1, S => diff_sig, CLK => S_AXI_ACLK);
 -- User logic ends

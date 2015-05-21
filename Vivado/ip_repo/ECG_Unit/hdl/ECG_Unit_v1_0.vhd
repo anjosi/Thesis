@@ -26,6 +26,14 @@ entity ECG_Unit_v1_0 is
     C_S_AXIS_TUSER_WIDTH        : integer := 4;
     C_M_AXIS_TUSER_WIDTH        : integer := 4;
     C_S_READ_f_FIFO_START_COUNT : integer := 32;
+    
+    --ECG detection params
+    C_ECG_R_THRESHOLD_PRI   : integer :=2000000;
+    C_ECG_T_THRESHOLD_PRI    : integer := 2000;
+   C_ECG_P_THRESHOLD_PRI   : integer :=900;
+    C_ECG_R_THRESHOLD_SEC   : integer :=1000000;
+    C_ECG_T_THRESHOLD_SEC    : integer := 1000;
+     C_ECG_P_THRESHOLD_SEC    : integer := 500;
 
     -- Width of S_AXI data bus
     C_S00_AXI_DATA_WIDTH : integer := 32;
@@ -104,6 +112,12 @@ architecture arch_imp of ECG_Unit_v1_0 is
     
     generic (
       -- Users to add parameters here
+       C_R_THRESHOLD_PRI   : integer :=2000000;
+     C_T_THRESHOLD_PRI    : integer := 2000;
+    C_P_THRESHOLD_PRI   : integer :=900;
+     C_R_THRESHOLD_SEC   : integer :=1000000;
+     C_T_THRESHOLD_SEC    : integer := 1000;
+      C_P_THRESHOLD_SEC    : integer := 500;
 
       -- User parameters ends
       -- Do not modify the parameters beyond this line
@@ -279,7 +293,13 @@ architecture arch_imp of ECG_Unit_v1_0 is
 begin
   ECG_Unit_v1_0_S00_AXI_inst : ECG_Unit_v1_0_S00_AXI
     generic map (
-      C_S_AXI_DATA_WIDTH => C_S00_AXI_DATA_WIDTH,
+     C_R_THRESHOLD_PRI => C_ECG_R_THRESHOLD_PRI,
+    C_T_THRESHOLD_PRI => C_ECG_T_THRESHOLD_PRI,
+	C_P_THRESHOLD_PRI => C_ECG_P_THRESHOLD_PRI,
+    C_R_THRESHOLD_SEC => C_ECG_R_THRESHOLD_SEC,
+    C_T_THRESHOLD_SEC => C_ECG_T_THRESHOLD_SEC,
+     C_P_THRESHOLD_SEC => C_ECG_P_THRESHOLD_SEC,
+     C_S_AXI_DATA_WIDTH => C_S00_AXI_DATA_WIDTH,
       C_S_AXI_ADDR_WIDTH => C_S00_AXI_ADDR_WIDTH
       )
     port map (

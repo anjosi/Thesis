@@ -11,7 +11,7 @@
 #include "platform.h"
 #include "fixPTool.h"
 #include "zed_signaling.h"
-#include "ECG_Unit.h"
+#include "as_ecg_application_param.h"
 //#include "write.c"
 
 /************************** Constant Definitions *****************************/
@@ -30,6 +30,8 @@ XLlFifo g_RawSignal_tx;
 XLlFifo g_NoiseFreeSignal_rx;
 XLlFifo g_DiffSignal_rx;
 u8 g_LedBlink;
+u8 ps_status;
+u8 led_blink;
 static u8 p_RawSignalBuffer[MAX_DATA_BUFFER_SIZE * WORD_SIZE];
 static u8 g_DiffSigBuffer[MAX_DATA_BUFFER_SIZE * WORD_SIZE];
 static u8 g_NoiseFreeSigBuffer[MAX_DATA_BUFFER_SIZE * WORD_SIZE];
@@ -63,7 +65,8 @@ int idle(void);
 int main(void)
 {
     init_platform();
-
+    ps_status = 0;
+    led_blink = 0;
 	int i,Status;
 
 	Status = XGpio_Initialize(&Gpio, GPIO_EXAMPLE_DEVICE_ID);
@@ -78,7 +81,7 @@ int main(void)
 
 	g_LedBlink = 0;
 
-	//ECG_UNIT_Reg_SelfTest((u32)XPAR_ECG_UNIT_0_S00_AXI_BASEADDR);
+	//ECG_DETECTOR_Reg_SelfTest((u32)XPAR_ECG_DETECTOR_0_DEVICE_ID);
 	while(!(0x0002&XGpio_DiscreteRead(&Gpio, BUTTON_CHANNEL)));
 #ifdef TEST
     u32 test = 0xfffd0000;
@@ -115,16 +118,46 @@ int main(void)
 	}
 	else
 		XGpio_DiscreteSet(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN);
+	
+	//set the QRS-peak detection threshold
+	ECG_DETECTOR_mWriteReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, QRS_PEAK_REG, QRS_PEAK_DETEC_THRESH_AMP);
+	//verify
+	if(QRS_PEAK_DETEC_THRESH_AMP == ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, QRS_PEAK_REG))
+	{
+		//set the length for the QRS detection signal
+		ECG_DETECTOR_mWriteReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, QRS_DELAY_REG, QRS_PEAK_DETEC_THRESH_DEL);
+		//verify
+		if(QRS_PEAK_DETEC_THRESH_DEL == ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, QRS_DELAY_REG))
+		{
+			//set the threshold value for the R-wave detection
+			ECG_DETECTOR_mWriteReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_PEAK_THRES_REG, R_PEAK_DETEC_THRESH);
+			//verify
+			if(R_PEAK_DETEC_THRESH == ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_PEAK_THRES_REG))
+			{
+				//set the threshold value for the lowest normal R-peak
+				ECG_DETECTOR_mWriteReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_MIN_THRES_REG, R_PEAK_MIN_THRESH);
+				//verify
+				if(R_PEAK_MIN_THRESH == ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_MIN_THRES_REG))
+				{
+					//set the threshold value for the highest possible R-peak
+					ECG_DETECTOR_mWriteReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_MAX_THRES_REG, R_PEAK_MAX_THRESH);
+					//verify
+					if(R_PEAK_MAX_THRESH == ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_MAX_THRES_REG))
+					{
+						FT_FORWARD forward = &toECG;
+						FT_IDLE l_Idle = &idle;
 
 
-	FT_FORWARD forward = &toECG;
-	FT_IDLE l_Idle = &idle;
+						/*
+						 * Run the uart_0 protocol to receive data from ARDUINO
+						 */
+						Status = run(forward, l_Idle);
+					}
+				}
+			}
+		}
 
-
-	/*
-	 * Run the uart_0 protocol to receive data from ARDUINO
-	 */
-	Status = run(forward, l_Idle);
+	}
 
 
 	//turn off the running LED
@@ -178,13 +211,13 @@ s8 toECG(u8 *p_Buf, u16 msg_length)
 	i = 0;
 	while((MAX_DATA_BUFFER_SIZE * WORD_SIZE) > (i +=	RxReceive(&g_DiffSignal_rx, &g_DiffSigBuffer[i])))	//receive the filtered samples form FIR
 	{
-		//TEST_PRINT("Received: %d", i);
+		TEST_PRINT("Received: %d", i);
 
 	}
 	i=0;
 	while((MAX_DATA_BUFFER_SIZE * WORD_SIZE) > (i +=	RxReceive(&g_NoiseFreeSignal_rx, &g_NoiseFreeSigBuffer[i])))	//receive the filtered samples form FIR
 	{
-		//TEST_PRINT("Received: %d", i);
+		TEST_PRINT("Received: %d", i);
 
 	}
 	//TEST_PRINT("Received: %d", i);
@@ -232,26 +265,52 @@ s8 toECG(u8 *p_Buf, u16 msg_length)
 		outbyte(MatLabBuffer[i]);
 
 #else
+	u32 stat = 0;
+		stat = ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, STATUS_REG);
+		led_blink = 0;
+		if((ps_status^(stat&ECG_ABN_MASK)) == 1)
+		{
+			if(ps_status == 1)
+				ps_status = 0;
+			else
+				ps_status = 1;
 
-	if(!(msgCount++%17))
+			led_blink = 1;
+		}
+		u8 low;
+		u8 high;
+		if(stat&COMP_VAL_MASK)
+		{
+			u32 min_peak = ECG_DETECTOR_mReadReg((u32)XPAR_ECG_DETECTOR_0_CTRL_AXI_BASEADDR, R_MIN_REG);
+			high = (u8)(min_peak >> 24);
+			low = (u8)((min_peak >> 16) & (u32)255);
+		}
+
+
+	if(led_blink == 1) //!(msgCount++%17) && // if an abnormal ecg signal is read as high the LEDs are lit.
 	{
-		if((g_LedBlink = ~g_LedBlink))
-			XGpio_DiscreteClear(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN|LED_PL);
-		else
-			XGpio_DiscreteSet(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN|LED_PL);
+		XGpio_DiscreteSet(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN|LED_PL);
+//		if((g_LedBlink = ~g_LedBlink))
+//			XGpio_DiscreteClear(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN|LED_PL);
+//		else
+//			XGpio_DiscreteSet(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN|LED_PL);
 	}
+	else
+		XGpio_DiscreteClear(&Gpio, LED_CHANNEL, LED_COMM_ARDU|LED_RUN|LED_PL);
+
 	outbyte(0xff);
 	outbyte(0xfb);
 	outbyte(0x04);
 	outbyte(0x0);
 
-
 		for(i = 0; i < (MAX_DATA_BUFFER_SIZE * WORD_SIZE); i +=4)
 		{
 			for(j = i; j < i+4; j++)
-				outbyte(g_DiffSigBuffer[j]);	//write 4 bytes of integrated signal
-			for(j = i+2; j < i+4; j++)
-				outbyte(g_NoiseFreeSigBuffer[j]); //write the integer portion (2 bytes) of noise free ecg sig
+				outbyte(g_NoiseFreeSigBuffer[j]);	//write 4 bytes of integrated signal
+//			for(j = i+2; j < i+4; j++)
+//				outbyte(g_DiffSigBuffer[j]); //write the integer portion (2 bytes) of noise free ecg sig
+			outbyte(low);
+			outbyte(high);
 		}
 
 #endif

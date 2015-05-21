@@ -104,8 +104,6 @@ set obj [get_filesets sim_1]
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
 set_property "top" "design_1_wrapper" $obj
-set_property "xelab.nosort" "1" $obj
-set_property "xelab.unifast" "" $obj
 
 # Create 'synth_1' run (if not found)
 if {[string equal [get_runs -quiet synth_1] ""]} {
@@ -129,8 +127,6 @@ if {[string equal [get_runs -quiet impl_1] ""]} {
 }
 set obj [get_runs impl_1]
 set_property "needs_refresh" "1" $obj
-set_property "steps.write_bitstream.args.readback_file" "0" $obj
-set_property "steps.write_bitstream.args.verbose" "0" $obj
 
 # set the current impl run
 current_run -implementation [get_runs impl_1]
