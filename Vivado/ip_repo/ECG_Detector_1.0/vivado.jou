@@ -1,0 +1,10 @@
+#-----------------------------------------------------------
+# Vivado v2014.4 (64-bit)
+# SW Build 1071353 on Tue Nov 18 18:29:27 MST 2014
+# IP Build 1070531 on Tue Nov 18 01:10:18 MST 2014
+# Start of session at: Sat Feb 14 21:15:52 2015
+# Process ID: 9484
+# Log file: C:/Users/Antti/Documents/GitHub/Thesis/Vivado/ip_repo/ECG_Detector_1.0/vivado.log
+# Journal file: C:/Users/Antti/Documents/GitHub/Thesis/Vivado/ip_repo/ECG_Detector_1.0\vivado.jou
+#-----------------------------------------------------------
+source build.tcl

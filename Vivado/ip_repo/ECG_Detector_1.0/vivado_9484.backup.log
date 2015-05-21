@@ -1,0 +1,30 @@
+#-----------------------------------------------------------
+# Vivado v2014.4 (64-bit)
+# SW Build 1071353 on Tue Nov 18 18:29:27 MST 2014
+# IP Build 1070531 on Tue Nov 18 01:10:18 MST 2014
+# Start of session at: Sat Feb 14 21:14:03 2015
+# Process ID: 6296
+# Log file: C:/Users/Antti/Documents/GitHub/Thesis/Vivado/ip_repo/ECG_Detector_1.0/vivado.log
+# Journal file: C:/Users/Antti/Documents/GitHub/Thesis/Vivado/ip_repo/ECG_Detector_1.0\vivado.jou
+#-----------------------------------------------------------
+source build.tcl
+# set origin_dir [file dirname [info script]]
+# create_project ECG_Unit_v1_4_project $origin_dir/../../../../../VivadoProjects/IP_projects/ecg_detector_v1_0_project
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kc705:part0:0.9 available at C:/Xilinx/Vivado/2014.4/data/boards/board_parts/kintex7/kc705/0.9/board_part.xml as part xc7k325tffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kc705:part0:1.0 available at C:/Xilinx/Vivado/2014.4/data/boards/board_parts/kintex7/kc705/1.0/board_part.xml as part xc7k325tffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:kc705:part0:1.1 available at C:/Xilinx/Vivado/2014.4/data/boards/board_parts/kintex7/kc705/1.1/board_part.xml as part xc7k325tffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zc706:part0:0.9 available at C:/Xilinx/Vivado/2014.4/data/boards/board_parts/zynq/zc706/0.9/board_part.xml as part xc7z045ffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zc706:part0:1.0 available at C:/Xilinx/Vivado/2014.4/data/boards/board_parts/zynq/zc706/1.0/board_part.xml as part xc7z045ffg900-2 specified in board_part file is either invalid or not available
+WARNING: [Board 49-26] cannot add Board Part xilinx.com:zc706:part0:1.1 available at C:/Xilinx/Vivado/2014.4/data/boards/board_parts/zynq/zc706/1.1/board_part.xml as part xc7z045ffg900-2 specified in board_part file is either invalid or not available
+# set proj_dir [get_property directory [current_project]]
+WARNING: [Coretcl 2-89] No projects matched 'edit_ECG_Detector_v1_0'
+# set obj [get_projects edit_ECG_Detector_v1_0]
+# set_property "default_lib" "xil_defaultlib" $obj
+ERROR: [Common 17-161] Invalid option value '' specified for 'objects'.
+
+    while executing
+"rdi::set_property default_lib xil_defaultlib {}"
+    invoked from within
+"set_property "default_lib" "xil_defaultlib" $obj"
+    (file "build.tcl" line 58)
+INFO: [Common 17-206] Exiting Vivado at Sat Feb 14 21:14:05 2015...

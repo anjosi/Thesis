@@ -1,0 +1,2 @@
+
+peak_det_v2_hw (v 1.8): this is directly initiated under ECG_Detector. The peak detector outputs all the peak candidates above the threshold. The input of the peak detector is the diff signal

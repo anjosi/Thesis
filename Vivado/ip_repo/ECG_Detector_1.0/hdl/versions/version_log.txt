@@ -1,0 +1,69 @@
+v3.2
+QRSDetector:
+The peak detection is suspended during the delay period.
+The delay comparator changed to greater than or equal.
+v3.3
+QRSDetector:
+The threshold address register was connected to the output.
+v3.4
+QRSDetector:
+sus_threshold and suspension_delay types changed to unsigned.
+v3.5
+QRSDetector:
+threshold_addr_r assigment changed to meet the ECG_Detector_v1_0_CTRL_AXI address schema.  The lsb of the address is 2 not 0.
+suspension_delay initialization changed to 1 instead of 0. 
+v4.0
+ECG_Detector_v1_0_CTRL_AXI:
+Register port for R-wave detector added. The R-wave detector can read the threshold value from the address 2.
+ECG_Detector_v1_0:
+peakDetector initiated for R-wave detection.
+v4.1
+ECG_Detector_v1_0:
+Double driver for the qrs_detected_x signal removed.
+v5.0 
+peakDetector:
+peakDetector wasa wrapped inside PQRSTDetector. The r_qrs_detected_x signal was moved from the clk_en to rst_n to drive the peakDetector's reset together with the aresetn singal. 
+PQRSTDetector:
+R-wave validation logic added.
+ECG_Detector_v1_0_CTRL_AXI:
+statistic logic added for R-wave. Threshold interfaces for wave_detector added.
+v5.1
+C_STAT_BUFFER_WINDOW parameter added in the ECG_Detector_v1_0 GUI.
+v5.2
+ECG_Detector_v1_0:
+PQRSTDetector's peak_data_out was also added to the tx2 streaming interface.
+v5.3
+ECG_Detector_v1_0_CTRL_AXI:
+min/max detection of the static buffer modified from parallel to sequential.
+v5.4
+ECG_Detector_v1_0_CTRL_AXI:
+mean value calculation removed.
+ECG_Detector_v1_0:
+sample valid signal changed from tx1 to tx2 for the PQRSTDetector output.
+v5.5
+PQRSTDetector:
+QRS_Detected signal moved from the peakDetector's rst_n to the clk_en.
+v5.6
+ECG_Detector_v1_0_CTRL_AXI:
+Debugging input signal for QRS_Detected added. The signal drives the bit 2 in the status register
+ECG_Detector_v1_0:
+The tx2 interface is regulated by QRS_Detected signal. if high the output is 1024 if low output is 0.
+Results:
+QRSDetector works as it should.
+v5.7
+PQRSTDetector:
+r_max_r drives the peak_data_out output for debugging purposes
+ECG_Detector_v1_0:
+tx2 data is driven directly by the peak_data_out of PQRSTDetector.
+Results:
+the r_max_r gets its value from slv_reg2 instead of slv_reg4. Problem
+v5.8
+PQRSTDetector:
+r_min_r drives the peak_data_out output for debugging purposes
+Results:
+the r_min_r gets its value from slv_reg4 instead of slv_reg3. Problem
+v5.9
+ECG_Detector_v1_0:
+tx2 interface gets its data from the PQRSTDetector's peak_data_out port and is regulated by the peak_data_valid_out signal
+PQRSTDetector:
+peak_data_out out is driven by the peak_amp_r as it should. 
